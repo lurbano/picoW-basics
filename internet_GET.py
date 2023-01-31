@@ -10,8 +10,8 @@ import ssl
 import adafruit_requests
 
 #REPLACE WITH WIFI DETAILS
-ssid = "Wifipower"
-password = "defacto1"
+ssid = "ssidName"
+password = "password"
 
 url = 'https://soriki.com/eve/fortune/fortune-json.php?name=Doc'
 
