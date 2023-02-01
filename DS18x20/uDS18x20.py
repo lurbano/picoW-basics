@@ -22,10 +22,10 @@ class uDS18X20:
         self.ow_bus = OneWireBus(dataPin)
 
         # scan for temp sensor
-        self.ds18 = DS18X20(ow_bus, ow_bus.scan()[0])
+        self.ds18 = DS18X20(self.ow_bus, self.ow_bus.scan()[0])
 
 
-    def read(self)
+    def read(self):
 
         T = self.ds18.temperature
         if self.units == "F":
@@ -68,4 +68,5 @@ class uDS18X20:
                     
             except Exception:
                 continue
+
 

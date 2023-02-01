@@ -1,5 +1,6 @@
 from DS18x20.uDS18x20 import *
 from GETLogger import *
+import time
 
 # TIMESTEP
 dt = 5 # seconds
@@ -17,21 +18,23 @@ T = thermo.read()
 print(f"Temperature = {T}")
 
 # set up logger *** SET ssid AND password
-logger = GETLogger("ssid", "password", "http://makerspace.local/logger.php")
+logger = GETLogger("TFS", "3144696622", "http://popu.local/logger/logger.php")
+
+# data["reading"] = str(thermo.read())
+# print("data:", data)
+# logger.log(data)
 
 
 startTime = time.monotonic() 
 mesTime = startTime
 while True:
     try:
-        currentTime = time.monotonic()
-        if (mesTime + dt) >= currentTime:
-            mesTime = currentTime
-            T = self.read()
-            runTime = mesTime - startTime
-            print(runTime, T)
-            data["reading"] = T
-            logger.log(data)
+        data["reading"] = str(thermo.read())
+        print("reading", data["reading"])
+        logger.log(data)
+        time.sleep(dt)
             
-    except Exception:
-        continue
+    except Exception as e:
+            print("Error:\n", str(e))
+            #continue
+

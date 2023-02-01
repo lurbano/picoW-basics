@@ -29,3 +29,7 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 * ThermoDS18x20
 ** Class for using a DS18x20 temperature sensor
 ** The default data pin is board.GP5
+** Add from lib/
+*** adafruit_ds18x20.mpy
+*** adafruit_onewire
+*** adafruit_bus_device

@@ -2,6 +2,8 @@ import wifi
 import socketpool
 import ssl
 import adafruit_requests
+import time
+import microcontroller
 
 class GETLogger:
     def __init__(self, ssid, password, server="http://makerspace.local/logger.php"):
@@ -14,7 +16,7 @@ class GETLogger:
         print("connected")
 
         self.pool = socketpool.SocketPool(wifi.radio)
-        self.requests = adafruit_requests.Session(pool, ssl.create_default_context())
+        self.requests = adafruit_requests.Session(self.pool, ssl.create_default_context())
 
         print("My MAC addr:", [hex(i) for i in wifi.radio.mac_address])
         print("My IP address is", wifi.radio.ipv4_address)
@@ -24,16 +26,21 @@ class GETLogger:
         #     dataDict = {"sensor": "T", "reading": "5", "units":"C"}
 
         # assemble get request 
-        url = server + "?"
+        url = self.server + "?"
         for key, val in dataDict.items():
             url += f"{key}={val}&"
+        url = url[:-1]
+            
+#         print("url: ", url)
+#         response = self.requests.get(url)
+#         print(response.text)
+#         print("-" * 40)
+#         response.close()
 
         try:
-            print("Logging to " % url)
-            response = requests.get(url)
-            print("-" * 40)
-            #  prints the response to the REPL
-            print("Text Response: ", response.text)
+            print("url: ", url)
+            response = self.requests.get(url)
+            print(response.text)
             print("-" * 40)
             response.close()
         except Exception as e:
@@ -41,4 +48,5 @@ class GETLogger:
             print("Resetting microcontroller in 10 seconds")
             time.sleep(10)
             microcontroller.reset()
+
 
