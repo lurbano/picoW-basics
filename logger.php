@@ -15,11 +15,14 @@
         } else {
             $info['reading'] = "none";
         }
+
+        $_GET["time"] = time();
+        $info["time"]=$_GET["time"];
         $info['saved'] = True;
 
         //save info to database file
         $file = fopen($db, 'a');
-        fwrite($file, json_encode($_GET)."\n");
+        fwrite($file, json_encode($info)."\n");
         fclose($file);
     } else {
         $info['saved'] = False;
