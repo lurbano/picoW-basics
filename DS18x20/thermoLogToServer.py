@@ -18,7 +18,7 @@ T = thermo.read()
 print(f"Temperature = {T}")
 
 # set up logger *** SET ssid AND password
-logger = GETLogger("TFS", "3144696622", "http://popu.local/logger/logger.php")
+logger = GETLogger("ssid", "password", "http://makerspace.local/logger/logger.php")
 
 # data["reading"] = str(thermo.read())
 # print("data:", data)
