@@ -16,20 +16,33 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 # Files and Folders
 
 * internet_GET.py: 
-** Queries Eve's fortune teller (php) and gets the response.
-** Sends "name=Doc" as a url parameter
+    * Queries Eve's fortune teller (php) and gets the response.
+    * Sends "name=Doc" as a url parameter
 
-* HX711
-** Code and library for weight/mass sensor
-** hx711_gpio.py library from: https://github.com/Miakatt/Hx711_circuitpython/blob/main/hx711_gpio.py
-*** Original?: https://github.com/robert-hh/hx711/blob/master/hx711_gpio.py
-** Wiring: https://tutorials-raspberrypi.com/digital-raspberry-pi-scale-weight-sensor-hx711/
-** will need to be calibrated with known masses
+* GETLogger.py:
+    * Class for making logging data to the server (logging/logger.php) easier. 
+    * Usage example in DS18x20/thermoLogToServer.py
 
-* ThermoDS18x20
-** Class for using a DS18x20 temperature sensor
-** The default data pin is board.GP5
-** Add from lib/
-*** adafruit_ds18x20.mpy
-*** adafruit_onewire
-*** adafruit_bus_device
+* HX711/: **Force/Mass sensor**
+    * Code and library for weight/mass sensor
+    * hx711_gpio.py library from: https://github.com/Miakatt/Hx711_circuitpython/blob/main/hx711_gpio.py
+        * Original?: https://github.com/robert-hh/hx711/blob/master/hx711_gpio.py
+    * Wiring: https://tutorials-raspberrypi.com/digital-raspberry-pi-scale-weight-sensor-hx711/
+    * will need to be calibrated with known masses
+
+* DS18x20: **Temperature sensor** (and logging)
+    * uDS18x20
+        * Class for using a DS18x20 temperature sensor
+        * The default data pin is board.GP5
+        * Add from lib/
+            * adafruit_ds18x20.mpy
+            * adafruit_onewire
+            * adafruit_bus_device
+    * thermoLogToServer.py: Program for picoW that sends data to the server (logger/logger.php) as a GET request every so often (dt).
+        * Uses GETLogger class (in GEtLogger.py)
+        * Assembles data to be sent in a dictionary called **data**.
+
+* **logging/**: Log data coming in from a picoW with a picoID
+    * logger.php: accepts GET requests and logs all info (plus time) to a file named based on the picoID sent (pico_{picoID}.json).
+    * picoSensorDB.js: class that fetches the data from the server for display.
+    * showData.html: Reads data for the given picoID from the serverand displays as a table. Refreshes every second.

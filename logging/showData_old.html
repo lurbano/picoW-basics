@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        td { 
-            border: 1px solid gray;
-        }
-    </style>
     <title>Document</title>
 </head>
 <body>
@@ -16,10 +11,9 @@
     <div id="data"></div>
 </body>
 
-<script src="picoSensorDB.js"></script> 
 <script>
 
-    function updateWebpage(data){
+    function updateData(data){
         dataDiv = document.getElementById("data");
         dataDiv.innerHTML = data;
     }
@@ -27,18 +21,15 @@
     x = 0;
     tDiv = document.getElementById("timer");
 
-    sensorDB = new picoSensorDB("TestR");
-
     setInterval(() => {
         
-        x++;    
+        x++;
+        
         tDiv.innerHTML = "hello " + x;
 
-        sensorDB.fetchData();
-        dataTable = sensorDB.getTable("mass");
-        //console.log("Table:", dataTable);
-        dataDiv = document.getElementById("data");
-        dataDiv.replaceChildren(dataTable);
+        fetch("testDB.json")
+            .then(x => x.text())
+            .then(y => updateData(y));
 
     }, 1000);
 
