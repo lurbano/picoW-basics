@@ -37,8 +37,13 @@ class picoSensorDB {
 
         for (let i=0; i<dataset.t.length; i++){
             let row = table.insertRow();
+
+            //time
             let cell = row.insertCell();
-            cell.textContent = dataset.t[i];
+            let t = new Date(dataset.t[i]*1000);
+            cell.textContent = t.toLocaleString('en-us', { weekday:"short", year:"numeric", month:"short", day:"numeric", hour:"numeric", minute:"numeric", second:"numeric"});
+            
+            //data
             cell = row.insertCell();
             cell.textContent = dataset.d[i];
         }
