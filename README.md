@@ -54,6 +54,8 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
         * Assembles data to be sent in a dictionary called **data**.
 
 * **logging/**: Log data coming in from a picoW with a picoID
-    * logger.php: accepts GET requests and logs all info (plus time) to a file named based on the picoID sent (pico_{picoID}.json).
-    * picoSensorDB.js: class that fetches the data from the server for display.
-    * showData.html: Reads data for the given picoID from the serverand displays as a table. Refreshes every second.
+    * Server side
+        * **logger.php**: accepts GET requests (example usage: DT18x20/thermoLogToServer.py) and logs all info (plus time) to a file named based on the picoID sent (pico_{picoID}.json).
+    * Client side
+        * **picoSensorDB.js**: class that fetches the data from the server for display.
+        * **showData.html**: Reads data for the given picoID from the serverand displays as a table. Refreshes every second.
