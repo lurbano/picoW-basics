@@ -15,14 +15,17 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 
 # Files and Folders
 
+---
+
 **pico/**: files for the pico. Used to send requests (GET so far) to a server.
 * **internet_GET.py**: 
     * Queries Eve's fortune teller (php) and gets the response.
     * Sends "name=Doc" as a url parameter
-
 * **GETLogger.py**:
     * Class for making logging data to the server (logging/logger.php) easier. 
     * Usage example in DS18x20/thermoLogToServer.py
+
+---
 
 **logging/**: Log data coming in from a picoW with a picoID
 * **Server side**
@@ -30,6 +33,8 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 * **Client side**
     * **picoSensorDB.js**: class that fetches the data from the server for display.
     * **showData.html**: Reads data for the given picoID from the serverand displays as a table. Refreshes every second.
+
+---
 
 **DS18x20**: **Temperature sensor** (and logging)
 * **uDS18x20.py**
@@ -42,6 +47,8 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 * **thermoLogToServer.py**: Program for picoW that sends data to the server (logger/logger.php) as a GET request every so often (dt).
     * Uses GETLogger class (in GEtLogger.py)
     * Assembles data to be sent in a dictionary called **data**.
+
+---
 
 **HX711/**: **Force/Mass sensor**
 * Code and library for weight/mass sensor
@@ -60,3 +67,5 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
         * SCK to GP6 (GPIO 6 but can be changed)
 * will need to be calibrated with known masses
 * **massTest.py**: testing the sensor and hx711_gpio.py class (not calibrated so just gets the raw output from sensor).
+
+---
