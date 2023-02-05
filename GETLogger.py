@@ -6,7 +6,7 @@ import time
 import microcontroller
 
 class GETLogger:
-    def __init__(self, ssid, password, server="http://makerspace.local/logger.php"):
+    def __init__(self, ssid, password, server="http://makerspace.local/logger/logger.php"):
 
         self.server = server 
         print("connecting")

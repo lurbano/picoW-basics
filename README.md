@@ -25,10 +25,21 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 
 * HX711/: **Force/Mass sensor**
     * Code and library for weight/mass sensor
-    * hx711_gpio.py library from: https://github.com/Miakatt/Hx711_circuitpython/blob/main/hx711_gpio.py
+    * **hx711_gpio.py** library from: https://github.com/Miakatt/Hx711_circuitpython/blob/main/hx711_gpio.py
         * Original?: https://github.com/robert-hh/hx711/blob/master/hx711_gpio.py
     * Wiring: https://tutorials-raspberrypi.com/digital-raspberry-pi-scale-weight-sensor-hx711/
+        * load sensor to hx711: The load sensor has 4 wires.
+            * Red to E+
+            * Black to E-
+            * Green to A-
+            * White to A+
+        * hx711 to picoW: 
+            * VCC to VBUS (5V)
+            * GND to GND (any one)
+            * DT to GP5 (GPIO 5 but can be changed)
+            * SCK to GP6 (GPIO 6 but can be changed)
     * will need to be calibrated with known masses
+    * **massTest.py**: testing the sensor and hx711_gpio.py class (not calibrated so just gets the raw output from sensor).
 
 * DS18x20: **Temperature sensor** (and logging)
     * uDS18x20
