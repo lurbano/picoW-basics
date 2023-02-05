@@ -15,13 +15,14 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 
 # Files and Folders
 
-* internet_GET.py: 
-    * Queries Eve's fortune teller (php) and gets the response.
-    * Sends "name=Doc" as a url parameter
+* **pico/**: files for the pico. Used to send requests (GET so far) to a server.
+    * **internet_GET.py**: 
+        * Queries Eve's fortune teller (php) and gets the response.
+        * Sends "name=Doc" as a url parameter
 
-* GETLogger.py:
-    * Class for making logging data to the server (logging/logger.php) easier. 
-    * Usage example in DS18x20/thermoLogToServer.py
+    * **GETLogger.py**:
+        * Class for making logging data to the server (logging/logger.php) easier. 
+        * Usage example in DS18x20/thermoLogToServer.py
 
 * HX711/: **Force/Mass sensor**
     * Code and library for weight/mass sensor
@@ -42,14 +43,14 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
     * **massTest.py**: testing the sensor and hx711_gpio.py class (not calibrated so just gets the raw output from sensor).
 
 * DS18x20: **Temperature sensor** (and logging)
-    * uDS18x20
+    * **uDS18x20.py**
         * Class for using a DS18x20 temperature sensor
         * The default data pin is board.GP5
         * Add from lib/
             * adafruit_ds18x20.mpy
             * adafruit_onewire
             * adafruit_bus_device
-    * thermoLogToServer.py: Program for picoW that sends data to the server (logger/logger.php) as a GET request every so often (dt).
+    * **thermoLogToServer.py**: Program for picoW that sends data to the server (logger/logger.php) as a GET request every so often (dt).
         * Uses GETLogger class (in GEtLogger.py)
         * Assembles data to be sent in a dictionary called **data**.
 
