@@ -27,6 +27,12 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 * **GETLogger.py**:
     * Class for making logging data to the server (logging/logger.php) easier. 
     * Usage example in DS18x20/thermoLogToServer.py
+* **serverTest.py**
+    * Serves basic webpage and checks every 30 seconds to see if it's still connected to the internet.
+**serverTest2.py**
+    * Serves basic webpage with buttons to turn the picoW's onboard led ON and OFF.
+* **serverTest-xml.py**
+    * Control the onboard led via a button on the webpage using xmlHTTPRequest
 
 ---
 
