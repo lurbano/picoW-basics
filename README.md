@@ -11,6 +11,8 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 * adafruit_requests.mpy
 ** which is in the bundle: https://github.com/adafruit/Adafruit_CircuitPython_Bundle/releases
 ** Note: get the 8.x version to match the circuitpython version.
+* adafruit_httpserver:
+** get version 8 from: https://github.com/adafruit/Adafruit_CircuitPython_HTTPServer/releases/tag/2.3.1
 
 
 # Files and Folders
@@ -21,6 +23,7 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 * **internet_GET.py**: 
     * Queries Eve's fortune teller (php) and gets the response.
     * Sends "name=Doc" as a url parameter
+    * requires adafruit_requests.py (in the lib directory)
 * **GETLogger.py**:
     * Class for making logging data to the server (logging/logger.php) easier. 
     * Usage example in DS18x20/thermoLogToServer.py
@@ -36,7 +39,7 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 
 ---
 
-**DS18x20**: **Temperature sensor** (and logging)
+**DS18x20/**: **Temperature sensor** (and logging)
 * **uDS18x20.py**
     * Class for using a DS18x20 temperature sensor
     * The default data pin is board.GP5
