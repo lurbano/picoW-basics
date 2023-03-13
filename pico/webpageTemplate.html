@@ -12,7 +12,8 @@
 
     <input type="button" id="led" value="LED">
 
-
+    <input type="button" id="Temperature" value="Get Temperature">
+    <span id="Tmp"></span>
     
 </body>
 <script>
@@ -38,6 +39,25 @@
         ledStatus = ledStatus === "OFF" ? "ON" : "OFF";
         data["action"] = ledStatus;
         xR.open("POST", "led", true);
+        xR.send(JSON.stringify(data));
+    }
+
+    TButton = d.getElementById("Temperature");
+    TButton.addEventListener("click", getT);
+
+    function getT(){
+        let xR = new XMLHttpRequest();
+        xR.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                
+                console.log("Server Response:", this.responseText);
+                data = JSON.parse(this.responseText);
+                Tmp.innerHTML = data['value'];
+            }
+        }
+        let data = {};
+        data["action"] = "getT";
+        xR.open("POST", "T", true);
         xR.send(JSON.stringify(data));
     }
 </script>

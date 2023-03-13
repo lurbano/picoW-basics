@@ -1,0 +1,236 @@
+# SPDX-FileCopyrightText: 2022 Liz Clark for Adafruit Industries
+#
+# SPDX-License-Identifier: MIT
+
+import os
+import time
+import ipaddress
+import wifi
+import socketpool
+import busio
+import board
+import microcontroller
+import json
+
+
+from digitalio import DigitalInOut, Direction
+from adafruit_httpserver.server import HTTPServer
+from adafruit_httpserver.request import HTTPRequest
+from adafruit_httpserver.response import HTTPResponse
+from adafruit_httpserver.methods import HTTPMethod
+from adafruit_httpserver.mime_type import MIMEType
+#from adafruit_onewire.bus import OneWireBus
+#from adafruit_ds18x20 import DS18X20
+
+from DS18x20.uDS18x20 import *
+
+thermo = uDS18X20(board.GP5)
+T = thermo.read()
+print(f"Temperature = {T}")
+
+#  onboard LED setup
+led = DigitalInOut(board.LED)
+led.direction = Direction.OUTPUT
+led.value = False
+
+
+#  function to convert celcius to fahrenheit
+#def c_to_f(temp):
+#    temp_f = (temp * 9/5) + 32
+#    return temp_f
+
+
+#  connect to network
+print()
+print("Connecting to WiFi")
+
+
+#  set static IP address
+# ipv4 =  ipaddress.IPv4Address("192.168.1.42")
+# netmask =  ipaddress.IPv4Address("255.255.255.0")
+# gateway =  ipaddress.IPv4Address("192.168.1.1")
+# wifi.radio.set_ipv4_address(ipv4=ipv4,netmask=netmask,gateway=gateway)
+#  connect to your SSID
+#wifi.radio.connect(os.getenv('CIRCUITPY_WIFI_SSID'), os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+wifi.radio.connect("TFS Students", "Fultoneagles")
+
+print("Connected to WiFi")
+pool = socketpool.SocketPool(wifi.radio)
+server = HTTPServer(pool)
+
+
+#  the HTML script
+#  setup as an f string
+#  this way, can insert string variables from code.py directly
+#  of note, use {{ and }} if something from html *actually* needs to be in brackets
+#  i.e. CSS style formatting
+def webpage():
+    html = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PicoW Test Server</title>
+</head>
+<body>
+    Pico W here.
+    
+    <div id="data">Hi</div>
+
+    <input type="button" id="led" value="LED">
+
+    <input type="button" id="Temperature" value="Get Temperature">
+    <span id="Tmp"></span>
+    
+</body>
+<script>
+    d = document;
+
+    d.getElementById("data").innerHTML = "Total";
+
+    ledStatus = "OFF";
+    ledButton = d.getElementById("led");
+    ledButton.addEventListener("click", makeRequest);
+
+    function makeRequest() {
+        let xR = new XMLHttpRequest();
+        xR.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                
+                console.log("Server Response:", this.responseText);
+                data = JSON.parse(this.responseText);
+                ledButton.value = data['status'] ? "ON" : "OFF";
+            }
+        }
+        let data = {};
+        ledStatus = ledStatus === "OFF" ? "ON" : "OFF";
+        data["action"] = ledStatus;
+        xR.open("POST", "led", true);
+        xR.send(JSON.stringify(data));
+    }
+
+    TButton = d.getElementById("Temperature");
+    TButton.addEventListener("click", getT);
+
+    function getT(){
+        let xR = new XMLHttpRequest();
+        xR.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                
+                console.log("Server Response:", this.responseText);
+                data = JSON.parse(this.responseText);
+                Tmp.innerHTML = data['value'];
+            }
+        }
+        let data = {};
+        data["action"] = "getT";
+        xR.open("POST", "T", true);
+        xR.send(JSON.stringify(data));
+    }
+</script>
+</html>
+    """
+    return html
+
+#  route default static IP
+@server.route("/")
+def base(request: HTTPRequest):  # pylint: disable=unused-argument
+    #  serve the HTML f string
+    #  with content type text/html
+    with HTTPResponse(request, content_type=MIMEType.TYPE_HTML) as response:
+        response.send(f"{webpage()}")
+        
+
+#@server.route("/", method=HTTPMethod.GET)
+#def getResponse(request: HTTPRequest):
+#    raw_text = request.raw_request.decode("utf8")
+#    print(raw_text)
+
+def requestToArray(request):
+    raw_text = request.body.decode("utf8")
+    print("Raw")
+    data = json.loads(raw_text)
+    return data
+
+@server.route("/led", method=HTTPMethod.POST)
+def ledButton(request: HTTPRequest):
+    # raw_text = request.body.decode("utf8")
+    # print("Raw")
+    # data = json.loads(raw_text)
+    data = requestToArray(request)
+    print(f"data: {data} & action: {data['action']}")
+    rData = {}
+    
+    if (data['action'] == 'ON'):
+        led.value = True
+        
+    if (data['action'] == 'OFF'):
+        led.value = False
+    
+    rData['item'] = "led"
+    rData['status'] = led.value
+        
+    with HTTPResponse(request) as response:
+        response.send(json.dumps(rData))
+
+@server.route("/T", method=HTTPMethod.POST)
+def getTemperature(request: HTTPRequest):
+    T = thermo.read()
+    print(f"Temperature = {T}")
+    rData = {}
+    rData["item"] = "T"
+    rData['value'] = T
+    with HTTPResponse(request) as response:
+        response.send(json.dumps(rData))
+    
+#  if a button is pressed on the site
+@server.route("/", method=HTTPMethod.POST)
+def buttonpress(request: HTTPRequest):
+    #  get the raw text
+    raw_text = request.raw_request.decode("utf8")
+    print(raw_text)
+    #  if the led on button was pressed
+    if "ON" in raw_text:
+        #  turn on the onboard LED
+        led.value = True
+    #  if the led off button was pressed
+    if "OFF" in raw_text:
+        #  turn the onboard LED off
+        led.value = False
+    with HTTPResponse(request, content_type=MIMEType.TYPE_HTML) as response:
+        response.send(f"{webpage()}")
+
+print("starting server..")
+# startup the server
+try:
+    server.start(str(wifi.radio.ipv4_address))
+    print("Listening on http://%s:80" % wifi.radio.ipv4_address)
+#  if the server fails to begin, restart the pico w
+except OSError:
+    time.sleep(5)
+    print("restarting..")
+    microcontroller.reset()
+ping_address = ipaddress.ip_address("8.8.4.4")
+
+
+clock = time.monotonic() #  time.monotonic() holder for server ping
+
+print("starting 30sec loop")
+print()
+
+while True:
+    try:
+        #  every 30 seconds, ping server & update temp reading
+        if (clock + 30) < time.monotonic():
+            if wifi.radio.ping(ping_address) is None:
+                print("lost connection")
+            else:
+                print("connected")
+            clock = time.monotonic()
+            #  comment/uncomment for desired units
+        server.poll()
+    # pylint: disable=broad-except
+    except Exception as e:
+        print(e)
+        continue
