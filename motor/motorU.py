@@ -1,17 +1,26 @@
 import board
-#import asyncio
+import asyncio
 import time
 import digitalio
 
 # Reference: https://ben.akrin.com/?p=9768
 
+
+def moveTwo(m1, m2, r=8):
+    for i in range(int(4096/r)):
+        m1.stepRotate(nsteps=r)
+        m2.stepRotate(nsteps=r)
+        # time.sleep(0.001)
+
+
 class motorU:
 
     def __init__(self, in1=board.GP2, in2=board.GP3, in3=board.GP4, in4=board.GP5,
-        step_sleep=0.001,
-        trigT = 32.):
+                 step_sleep=0.001,
+                 trigT=32.):
 
-        self.step_360 = int(4096)   # number of steps required for 360 degree turn
+        # number of steps required for 360 degree turn
+        self.step_360 = int(4096)
         self.din1 = digitalio.DigitalInOut(in1)
         self.din2 = digitalio.DigitalInOut(in2)
         self.din3 = digitalio.DigitalInOut(in3)
@@ -20,16 +29,16 @@ class motorU:
         self.step_sleep = step_sleep
 
         # defining stepper motor sequence (found in documentation http://www.4tronix.co.uk/arduino/Stepper-Motors.php)
-        self.step_sequence = [[1,0,0,1],
-                 [1,0,0,0],
-                 [1,1,0,0],
-                 [0,1,0,0],
-                 [0,1,1,0],
-                 [0,0,1,0],
-                 [0,0,1,1],
-                 [0,0,0,1]]
+        self.step_sequence = [[1, 0, 0, 1],
+                              [1, 0, 0, 0],
+                              [1, 1, 0, 0],
+                              [0, 1, 0, 0],
+                              [0, 1, 1, 0],
+                              [0, 0, 1, 0],
+                              [0, 0, 1, 1],
+                              [0, 0, 0, 1]]
 
-        #initialize Pins
+        # initialize Pins
         self.din1.direction = digitalio.Direction.OUTPUT
         self.din2.direction = digitalio.Direction.OUTPUT
         self.din3.direction = digitalio.Direction.OUTPUT
@@ -40,20 +49,29 @@ class motorU:
         self.din3.value = False
         self.din4.value = False
 
-
         self.motor_pins = [self.din1, self.din2, self.din3, self.din4]
 
         # for greenhouse
         self.trigT = trigT
         self.windowOpen = False
 
-
     def cleanup(self):
-        GPIO.output( self.in1, GPIO.LOW )
-        GPIO.output( self.in2, GPIO.LOW )
-        GPIO.output( self.in3, GPIO.LOW )
-        GPIO.output( self.in4, GPIO.LOW )
-        GPIO.cleanup()
+        self.din1.value = False
+        self.din2.value = False
+        self.din3.value = False
+        self.din4.value = False
+
+    def stepRotate(self, nsteps=16, direction="clockwise"):
+        motor_step_counter = 0
+        for i in range(nsteps):
+            for pin in range(0, len(self.motor_pins)):
+                self.motor_pins[pin].value = self.step_sequence[motor_step_counter][pin]
+            if direction == "clockwise":
+                motor_step_counter = (motor_step_counter - 1) % 8
+            elif direction == "counterClockwise":
+                motor_step_counter = (motor_step_counter + 1) % 8
+
+            time.sleep(self.step_sleep)
 
     def rotate(self, nRotations=1, direction="clockwise"):
         nsteps = int(self.step_360 * nRotations)
@@ -61,12 +79,26 @@ class motorU:
         for i in range(nsteps):
             for pin in range(0, len(self.motor_pins)):
                 self.motor_pins[pin].value = self.step_sequence[motor_step_counter][pin]
-            if direction=="clockwise":
+            if direction == "clockwise":
                 motor_step_counter = (motor_step_counter - 1) % 8
             elif direction == "counterClockwise":
                 motor_step_counter = (motor_step_counter + 1) % 8
 
             time.sleep(self.step_sleep)
+
+    async def aRotate(self, nRotations=1, direction="clockwise"):
+        nsteps = int(self.step_360 * nRotations)
+        motor_step_counter = 0
+        for i in range(nsteps):
+            for pin in range(0, len(self.motor_pins)):
+                self.motor_pins[pin].value = self.step_sequence[motor_step_counter][pin]
+            if direction == "clockwise":
+                motor_step_counter = (motor_step_counter - 1) % 8
+            elif direction == "counterClockwise":
+                motor_step_counter = (motor_step_counter + 1) % 8
+
+            await asyncio.sleep(self.step_sleep)
+            # time.sleep(self.step_sleep)
 
     # async def aRotate(self, nRotations=1, direction="clockwise"):
     #     nsteps = int(self.step_360 * nRotations)
@@ -82,7 +114,8 @@ class motorU:
     #         await asyncio.sleep(self.step_sleep)
 
     def openWindow(self):
-        self.rotate(direction="counterClockwise") #just because that's my current physical design
+        # just because that's my current physical design
+        self.rotate(direction="counterClockwise")
         self.windowOpen = True
 
     # async def aOpenWindow(self):
@@ -90,7 +123,8 @@ class motorU:
     #     self.windowOpen = True
 
     def closeWindow(self, direction=True):
-        self.rotate(direction="clockwise")  #just because that's my current physical design
+        # just because that's my current physical design
+        self.rotate(direction="clockwise")
         self.windowOpen = False
 
     # async def aCloseWindow(self, direction=True):
