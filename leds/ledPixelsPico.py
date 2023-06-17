@@ -159,10 +159,13 @@ class ledPixels:
         r, g, b = min(r, 255), min(g, 255), min(b, 255)
         return (r, g, b)
 
-    def fade(self, colorFrom=(100, 0, 0), colorTo=(0, 100, 100), timeSpan=5, dt=0.1, n=-1):
-        '''fade n pixels from colorFrom to colorTo over timeSpan using steps of dt'''
-        if n == -1:
-            n = self.nPix
+    def fade(self, colorFrom=(100, 0, 0), colorTo=(0, 100, 100), timeSpan=5, dt=0.1, pixFrom=-1, pixTo=-1, dPix=1):
+        '''fade pixels (from pixFrom to pixTo, with a step of dPix)
+            from colorFrom to colorTo over timeSpan using steps of dt'''
+        if pixFrom < 0:
+            pixFrom = 0
+        if pixTo == -1 or pixTo > self.nPix:
+            pixTo = self.nPix
         nsteps = int(timeSpan/dt)
         colorFrom = np.array(colorFrom)
         colorTo = np.array(colorTo)
@@ -171,7 +174,9 @@ class ledPixels:
             factor = i/nsteps
             c = colorFrom + factor * dc
             c = self.clip(c)
-            self.setColor(c)
+            for p in range(pixFrom, pixTo, dPix):
+                self.pixels[p] = c
+            self.pixels.show()
             time.sleep(dt)
 
     async def aTimer(self, serv, m, s):
