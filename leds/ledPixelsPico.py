@@ -3,16 +3,20 @@
 import neopixel
 import board
 import time
+import random
 
 import ulab.numpy as np
+
 
 def hex_to_rgb(value):
     value = value.lstrip('#')
     lv = len(value)
     return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
+
 def rgb_to_hex(rgb):
     return '#%02x%02x%02x' % rgb
+
 
 def diffuse(T, k=0.1):
     n = len(T)
@@ -28,9 +32,10 @@ def diffuse(T, k=0.1):
         Tnew[i] = T[i] + qin + qout
     return Tnew
 
-def strToCol(str): #formatted like '255,0,255'
+
+def strToCol(str):  # formatted like '255,0,255'
     color = str.strip()
-    color = color.replace(" ","")
+    color = color.replace(" ", "")
     color = color.split(",")
     r = float(color[0])
     g = float(color[1])
@@ -38,8 +43,20 @@ def strToCol(str): #formatted like '255,0,255'
     color = (r, g, b)
     return color
 
+
+def decToBase(decimal, base=2):
+    if decimal == 0:
+        return '0'
+    s = ''
+    while decimal > 0:
+        remainder = decimal % base
+        s = str(remainder) + s
+        decimal //= base
+    return s
+
+
 class sinFunc:
-    def __init__(self, freq=1.0, phase=0.0, offset=0.0, color=(100,0,0), speed=0.1):
+    def __init__(self, freq=1.0, phase=0.0, offset=0.0, color=(100, 0, 0), speed=0.1):
         self.freq = freq
         self.phase = phase
         self.offset = offset
@@ -50,14 +67,13 @@ class sinFunc:
 
 class ledPixels:
     def __init__(self, nPix, ledPin):
-        #self.nPix = nPix
+        # self.nPix = nPix
         self.ledPin = ledPin
         self.nPixSet(nPix)
-        #self.pixels = neopixel.NeoPixel(board.D18, nPix, auto_write=False)
+        # self.pixels = neopixel.NeoPixel(board.D18, nPix, auto_write=False)
         self.interrupt = False
-        self.brightness = 1.0 # from 0 to 1
+        self.brightness = 1.0  # from 0 to 1
         self.task = None
-
 
     def nPixSet(self, nPix):
         print("nPix ledPix:", nPix)
@@ -65,7 +81,7 @@ class ledPixels:
         self.pixels = neopixel.NeoPixel(self.ledPin, nPix, auto_write=False)
         self.oldColors = []
         for i in range(nPix):
-            self.oldColors.append((0,0,0))
+            self.oldColors.append((0, 0, 0))
         print("nPix Set")
 
     def initCodeColor(self):
@@ -77,13 +93,16 @@ class ledPixels:
         self.pixels[n] = col
         self.pixels.show()
 
+    def lightRange(self, rng, col=(100, 0, 0)):
+        for i in rng:
+            self.light(i, col)
+
     def show(self):
         self.pixels.show()
 
     def superimpose(self, i, col):
-        (r,g,b) = self.pixels[i]
+        (r, g, b) = self.pixels[i]
         self.pixels[i] = (col[0]+r, col[1]+g, col[2]+b)
-
 
     def setOldColors(self, col=None):
         if col == None:
@@ -98,17 +117,17 @@ class ledPixels:
 
     def clear(self):
         for i in range(self.nPix):
-            self.pixels[i] = (0,0,0)
+            self.pixels[i] = (0, 0, 0)
         self.pixels.show()
         self.setOldColors()
 
     def resetPix(self):
         for i in range(self.nPix):
-            self.pixels[i] = (0,0,0)
+            self.pixels[i] = (0, 0, 0)
 
     def reset(self):
         for i in range(self.nPix):
-            self.pixels[i] = (0,0,0)
+            self.pixels[i] = (0, 0, 0)
 
     def rainbow(self, n=1, speed=0.01):
         for i in range(n):
@@ -133,6 +152,28 @@ class ledPixels:
         while 1:
             self.rainbow_cycle(speed)
 
+    def clip(self, color=(0, 0, 0)):
+        '''restrict values in color to 0-255'''
+        r, g, b = color
+        r, g, b = max(r, 0), max(g, 0), max(b, 0)
+        r, g, b = min(r, 255), min(g, 255), min(b, 255)
+        return (r, g, b)
+
+    def fade(self, colorFrom=(100, 0, 0), colorTo=(0, 100, 100), timeSpan=5, dt=0.1, n=-1):
+        '''fade n pixels from colorFrom to colorTo over timeSpan using steps of dt'''
+        if n == -1:
+            n = self.nPix
+        nsteps = int(timeSpan/dt)
+        colorFrom = np.array(colorFrom)
+        colorTo = np.array(colorTo)
+        dc = colorTo - colorFrom
+        for i in range(nsteps):
+            factor = i/nsteps
+            c = colorFrom + factor * dc
+            c = self.clip(c)
+            self.setColor(c)
+            time.sleep(dt)
+
     async def aTimer(self, serv, m, s):
         timeLeft = int(m*60 + s)
         totTime = int(m*60 + s)
@@ -140,15 +181,15 @@ class ledPixels:
         while timeLeft > 0:
             timeLeft -= 1
             nLights = int(self.nPix * timeLeft/totTime)
-            self.twoColors(nLights, (0,255,0), (100,0,0))
-            #print(timeLeft, nLights)
+            self.twoColors(nLights, (0, 255, 0), (100, 0, 0))
+            # print(timeLeft, nLights)
             m = timeLeft // 60
             s = timeLeft % 60
-            serv.write_message({"info": "timer", "m":m, "s":s})
+            serv.write_message({"info": "timer", "m": m, "s": s})
             await asyncio.sleep(1)
         print("Timer Done.")
 
-    def twoColors(self, n, col1=(0,0,255), col2=(0,0,0)):
+    def twoColors(self, n, col1=(0, 0, 255), col2=(0, 0, 0)):
         for i in range(self.nPix):
             if i < n:
                 self.pixels[i] = self.brighten(col1)
@@ -156,7 +197,7 @@ class ledPixels:
                 self.pixels[i] = self.brighten(col2)
         self.pixels.show()
 
-    def twoColorsTimestep(self, n, col1=(0,0,255), col2=(0,0,0), dt=0.1):
+    def twoColorsTimestep(self, n, col1=(0, 0, 255), col2=(0, 0, 0), dt=0.1):
         for i in range(self.nPix):
             if i < n:
                 self.pixels[i] = self.brighten(col1)
@@ -168,7 +209,7 @@ class ledPixels:
     def setColor(self, col):
         if col[0] == "#":
             col = hex_to_rgb(col)
-        print("setting color to:", col)
+        # print("setting color to:", col)
         self.cancelTask()
         self.brightness = 1.0
         for i in range(self.nPix):
@@ -200,12 +241,13 @@ class ledPixels:
 
     def blue(self):
         for i in range(self.nPix):
-            self.pixels[i] = (0,0,int(255*self.brightness))
+            self.pixels[i] = (0, 0, int(255*self.brightness))
         self.pixels.show()
-        self.setOldColors((0,0,255))
+        self.setOldColors((0, 0, 255))
 
     def scale(self, val):
-        n = round(self.nPix * (val-self.scaleMin)/(self.scaleMax-self.scaleMin))
+        n = round(self.nPix * (val-self.scaleMin) /
+                  (self.scaleMax-self.scaleMin))
 
         if n < 0:
             n = 0
@@ -215,16 +257,16 @@ class ledPixels:
         for i in range(n):
             self.pixels[i] = self.scaleCol
         for i in range(n, self.nPix):
-            self.pixels[i] = (0,0,0)
+            self.pixels[i] = (0, 0, 0)
         self.pixels.show()
         self.setOldColors()
 
-    def setupScale(self, minVal=0., maxVal=100., color=(0,100,0)):
+    def setupScale(self, minVal=0., maxVal=100., color=(0, 100, 0)):
         self.scaleMin = minVal
         self.scaleMax = maxVal
         self.scaleCol = color
 
-    #UTILITY METHODS
+    # UTILITY METHODS
     def rainbow_cycle(self, wait):
         for j in range(255):
             for i in range(self.nPix):
@@ -232,17 +274,16 @@ class ledPixels:
                 self.pixels[i] = self.wheel(pixel_index & 255, 0.5)
             self.pixels.show()
             time.sleep(wait)
-            
+
     def rainbowSeq(self, wait=0.1):
         for t in range(255):
             pixel_index = (1 * 256 // self.nPix) + t
             self.setColor(self.wheel(pixel_index & 255, 0.5))
             time.sleep(wait)
-            
+
     def rainbowSeqForever(self, wait=0.1):
         while True:
             self.rainbowSeq(wait)
-            
 
     async def aRainbow_cycle(self, wait):
         for j in range(255):
@@ -252,9 +293,8 @@ class ledPixels:
             self.pixels.show()
             await asyncio.sleep(wait)
 
-
     def cancelTask(self):
-        print("Canceling last task.")
+        # print("Canceling last task.")
         if self.task:
             self.task.cancel()
 
@@ -290,7 +330,7 @@ class ledPixels:
         # Uses explicit finite difference equation so
         #   instabilities may occur at high k values
         (r, g, b) = ([], [], [])
-        (rSum, gSum, bSum) = (0,0,0)
+        (rSum, gSum, bSum) = (0, 0, 0)
 
         # initialize
         for i in range(self.nPix):
@@ -301,7 +341,7 @@ class ledPixels:
             gSum += g[-1]
             bSum += b[-1]
 
-        #print("sums:", rSum, gSum, bSum)
+        # print("sums:", rSum, gSum, bSum)
 
         for t in range(nsteps):
             r = diffuse(r, k=0.1)
@@ -314,14 +354,14 @@ class ledPixels:
             self.pixels.show()
             time.sleep(dt)
 
-    def normalDistribution(self, n, col=(255,0,0), sig=1.0):
+    def normalDistribution(self, n, col=(255, 0, 0), sig=1.0):
 
         for i in range(self.nPix):
-            #print(i, self.pixels[i])
+            # print(i, self.pixels[i])
             r_o = self.pixels[i][0]
             g_o = self.pixels[i][1]
             b_o = self.pixels[i][2]
-            (r,g,b) = col
+            (r, g, b) = col
 
             d = (1/(sig*(2*np.pi)**0.5))*np.e**(-0.5*(np.abs(i-n)/sig)**2)
 
@@ -329,18 +369,19 @@ class ledPixels:
             g = min(g_o + d * g / 0.4, 255)
             b = min(b_o + d * b / 0.4, 255)
             self.pixels[i] = (r, g, b)
-        #self.pixels.show()
+        # self.pixels.show()
 
-    def sin(self, frequency, phase, col=(255,0,0), offset=0.0):
+    def sin(self, frequency, phase, col=(255, 0, 0), offset=0.0):
         if col[0] == "#":
             col = hex_to_rgb(col)
         for i in range(self.nPix):
             r_o = self.pixels[i][0]
             g_o = self.pixels[i][1]
             b_o = self.pixels[i][2]
-            (r,g,b) = col
+            (r, g, b) = col
 
-            f =  np.sin(frequency *((2*np.pi*i/self.nPix) - phase*np.pi)) + offset
+            f = np.sin(
+                frequency * ((2*np.pi*i/self.nPix) - phase*np.pi)) + offset
 
             r = r_o + r * f
             r = min(max(0.0, r), 255) * self.brightness
@@ -354,14 +395,16 @@ class ledPixels:
     async def aSin(self, frequency, phase, col="#00ff00", offset=0.0, dt=0.0):
         if col[0] == "#":
             col = hex_to_rgb(col)
-        print(f"making sin curve with: frequency = {frequency}, phase = {phase}, color = {col}, offset = {offset}, dt = {dt}")
+        print(
+            f"making sin curve with: frequency = {frequency}, phase = {phase}, color = {col}, offset = {offset}, dt = {dt}")
         for i in range(self.nPix):
             r_o = self.pixels[i][0]
             g_o = self.pixels[i][1]
             b_o = self.pixels[i][2]
-            (r,g,b) = col
+            (r, g, b) = col
 
-            f =  np.sin(frequency *((2*np.pi*i/self.nPix) - phase*np.pi)) + offset
+            f = np.sin(
+                frequency * ((2*np.pi*i/self.nPix) - phase*np.pi)) + offset
 
             r = r_o + r * f
             r = min(max(0.0, r), 255)
@@ -374,11 +417,11 @@ class ledPixels:
             self.pixels.show()
             await asyncio.sleep(dt)
 
-    def threeSins(self, freq=1, speed = 0.002, dt=0.001, ncycles=10):
+    def threeSins(self, freq=1, speed=0.002, dt=0.001, ncycles=10):
         sins = []
-        sins.append(sinFunc(freq, 0, 0, (0,0,255), speed))
-        sins.append(sinFunc(freq, 0, 0, (0,255,0), 1.2*speed))
-        sins.append(sinFunc(freq, 0, 0, (255,0,0), 1.4*speed))
+        sins.append(sinFunc(freq, 0, 0, (0, 0, 255), speed))
+        sins.append(sinFunc(freq, 0, 0, (0, 255, 0), 1.2*speed))
+        sins.append(sinFunc(freq, 0, 0, (255, 0, 0), 1.4*speed))
         direction = 1.0
 
         print(f'nsteps: {2*np.pi/dt}')
@@ -397,3 +440,61 @@ class ledPixels:
                 #     print(i)
 
             direction *= -1.0
+
+    def twoColorTimer(self, t=5*60, c1=(0, 200, 0), c2=(0, 0, 50)):
+        ''' two color timer with time (t) set in seconds'''
+        startTime = time.monotonic()
+        dt = 0
+        self.clear()
+
+        while dt < t:
+            n = int(dt * self.nPix / t)
+            self.twoColors(n, c2, c1)
+            print(dt, dt/t, n)
+            time.sleep(1)
+            dt = time.monotonic() - startTime
+        self.setColor(c2)
+
+    def binaryLED(self, t, col=(100, 0, 0), baseCol=(0, 0, 50), start_i=0):
+        bTime = str(bin(t))
+        print(t, bTime, len(bTime))
+        n = start_i
+        for i in range(2, len(bTime)):
+            # print(i, bTime[i])
+            if bTime[i] == "1":
+                self.light(n, col)
+            else:
+                self.light(n, baseCol)
+            n += 1
+
+    def base3LED(self, num, colors=[(100, 0, 0), (0, 100, 0), (0, 0, 100)], start_i=0):
+        '''convert a number to base 3 and show the ternery number using leds'''
+        timeStr = decToBase(num, 3)
+        print(num, timeStr, len(timeStr))
+        n = start_i
+        for s in timeStr:
+            # print(s, bTime[i])
+            self.light(n, colors[int(s)])
+            n += 1
+
+    def base_n_LED(self, num, base=2, colors=[], start_i=0, printOut=False):
+        '''convert a number (num) to any base and show the number using leds
+            if there are less colors than the base then random additional colors are appended'''
+        if len(colors) < base:
+            for i in range(base, len(colors)):
+                colors.append((random.randint(0, 255), random.randint(
+                    0, 255), random.randint(0, 255)))
+        timeStr = decToBase(num, base)
+        if printOut:
+            print(num, timeStr, len(timeStr))
+        n = start_i
+        for s in timeStr:
+            # print(s, bTime[i])
+            self.light(n, colors[int(s)])
+            n += 1
+
+    def blinkOneLED(self, n=0, dt=1, color=(100, 0, 0)):
+        self.light(n, color)
+        time.sleep(dt)
+        self.light(n, (0, 0, 0))
+        time.sleep(dt)
