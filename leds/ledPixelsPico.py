@@ -179,6 +179,16 @@ class ledPixels:
             self.pixels.show()
             time.sleep(dt)
 
+    def rotateColors(self, colors, timeSpan=5, dt=0.1, startPix=0):
+        '''rotate through the given list of colors using the timestep dt starting at startPix pixel'''
+        for i in range(len(colors)):
+            for j in range(len(colors)):
+                n = startPix + j
+                self.pixels[n] = colors[j]
+            self.pixels.show()
+            colors = colors[-1:] + colors[:-1]
+            time.sleep(dt)
+
     async def aTimer(self, serv, m, s):
         timeLeft = int(m*60 + s)
         totTime = int(m*60 + s)
