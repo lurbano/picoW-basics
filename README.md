@@ -77,4 +77,7 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 * will need to be calibrated with known masses
 * **massTest.py**: testing the sensor and hx711_gpio.py class (not calibrated so just gets the raw output from sensor).
 
+
+**Audio**:
+* Reference (adafruit): https://learn.adafruit.com/mp3-playback-rp2040/pico-mp3
 ---
