@@ -3,6 +3,7 @@ import board
 import digitalio
 from HX711.hx711_gpio import HX711
 
+
 # setup pins
 pin_OUT = digitalio.DigitalInOut(board.GP5)
 pin_SCK = digitalio.DigitalInOut(board.GP6)
