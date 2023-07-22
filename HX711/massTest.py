@@ -2,7 +2,7 @@ import time
 import board
 import digitalio
 from HX711.hx711_gpio import HX711
-
+# VSCodium Test
 
 # setup pins
 pin_OUT = digitalio.DigitalInOut(board.GP5)
