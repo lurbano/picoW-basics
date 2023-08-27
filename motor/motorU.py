@@ -4,6 +4,9 @@ import time
 import digitalio
 
 # Reference: https://ben.akrin.com/?p=9768
+# Required Libraries:
+#   - asyncio
+#   - adafruit_ticks
 
 
 def moveTwo(m1, m2, r=8):
