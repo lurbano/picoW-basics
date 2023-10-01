@@ -20,6 +20,11 @@ warnTime = 10
 
 mx = 100       # maximum light level
 
+# TOUCH SENSORS
+resetPin = board.GP11
+resetTouch = touchio.TouchIn(resetPin)
+
+
 def readyStatusLight():
     ledPix.pixels[-1] = (0, 0, mx)
     ledPix.show()
@@ -28,11 +33,18 @@ def pauseMode():
     ledPix.pixels[-1] = (mx, 0, 0)
     ledPix.show()
     startPause = time.monotonic()
+    l_reset = False
     while timerBtn.value:
+        while resetTouch.value:
+            l_reset = True
+            lightUp(timerPix, (0,mx,0))
         time.sleep(0.1)
     readyStatusLight()
-    pauseTime = time.monotonic() - startPause
-    return pauseTime + startTime
+    if l_reset:
+        return time.monotonic()
+    else:
+        pauseTime = time.monotonic() - startPause
+        return pauseTime + startTime
 
 def lightUp(n, col):
     for i in range(timerPix):
@@ -47,6 +59,10 @@ readyStatusLight()
 
 
 while True:
+    while resetTouch.value:
+        startTime = time.monotonic()
+        time.sleep(0.1)
+    
     if timerBtn.value:
         startTime = pauseMode()
     else:

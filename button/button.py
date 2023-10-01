@@ -2,11 +2,10 @@
 
 import board
 import time
-from digitalio import DigitalInOut, Direction, Pull
+import digitalio
 
-timerBtn = DigitalInOut(board.GP19)
-timerBtn.direction = Direction.INPUT
-timerBtn.pull = Pull.UP
+timerBtn = digitalio.DigitalInOut(board.GP9)
+timerBtn.pull = digitalio.Pull.DOWN
 
 while True:
     if timerBtn.value:
