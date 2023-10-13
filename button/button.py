@@ -1,4 +1,5 @@
 # Get signal from a button
+# one pole to 3.3V and one to a GP pin
 
 import board
 import time
