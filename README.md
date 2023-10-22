@@ -4,7 +4,9 @@ Basic functions working with the Pi pico W - especially for wireless capabilitie
 
 # Setup
 
-Copy the file in the circuitpython folder (original source: https://circuitpython.org/board/raspberry_pi_pico_w/) to the Pico.
+Install Circuitpython:
+* Download and copy the circuitpython uf2 to the Pico from:
+    * https://circuitpython.org/board/raspberry_pi_pico_w/
 * It needs to be at least version 8.0.0 to have the capabilities for working with the wireless pico.
 
 Copy the adafruit_requests file from the lib folder to the lib folder on the pico.
