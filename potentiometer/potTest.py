@@ -14,7 +14,7 @@ Connections: (view from back)
   Ain - analog pin on the pico
 '''
 
-'''
+
 
 knob = AnalogIn(board.A1)
 
