@@ -232,9 +232,9 @@ class ledPixels:
             col = hex_to_rgb(col)
         # print("setting color to:", col)
         self.cancelTask()
-        self.brightness = 1.0
+        # self.brightness = 1.0
         for i in range(self.nPix):
-            self.pixels[i] = col
+            self.pixels[i] = (col[0] * self.brightness, col[1]* self.brightness, col[2] * self.brightness)
         self.pixels.show()
         self.setOldColors()
 
@@ -521,3 +521,4 @@ class ledPixels:
         time.sleep(dt)
 
     
+
