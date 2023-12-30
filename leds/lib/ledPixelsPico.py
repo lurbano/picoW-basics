@@ -97,11 +97,23 @@ class ledPixels:
         
     def off(self):
         self.setColor((0,0,0))
+        
+    def lightAll(self, col):
+        if col[0] == "#":
+            col = hex_to_rgb(col)
+        # print("setting color to:", col)
+        for i in range(self.nPix):
+            self.pixels[i] = self.brightify(col)
+        self.pixels.show()
+        self.setOldColors()
 
     def lightRange(self, rng, color=(100, 0, 0)):
         '''Light up range of pixels (rng) with color'''
         for i in rng:
             self.light(i, color)
+            
+    def brightify(self, col):
+        return (int(col[0]*self.brightness),int(col[1]*self.brightness),int(col[2]*self.brightness))
 
     def show(self):
         self.pixels.show()
@@ -232,9 +244,9 @@ class ledPixels:
             col = hex_to_rgb(col)
         # print("setting color to:", col)
         self.cancelTask()
-        # self.brightness = 1.0
+        self.brightness = 1.0
         for i in range(self.nPix):
-            self.pixels[i] = (col[0] * self.brightness, col[1]* self.brightness, col[2] * self.brightness)
+            self.pixels[i] = col
         self.pixels.show()
         self.setOldColors()
 
@@ -521,4 +533,3 @@ class ledPixels:
         time.sleep(dt)
 
     
-

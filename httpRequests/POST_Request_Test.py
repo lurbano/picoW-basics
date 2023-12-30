@@ -1,3 +1,7 @@
+'''
+Reference: adafruit-circuitpython-bundle-8.x-mpy*/examples/requests_https_circuitpython.py
+'''
+
 import wifi
 import socketpool
 import adafruit_requests as requests
@@ -16,6 +20,6 @@ data = {}
 data["action"] = "Rhythmbox"
 data["value"] = "play"
 
-x = http.post("http://192.168.1.142:8000", data=json.dumps(data))
-print(x)
+response = http.post("http://192.168.1.142:8000", data=json.dumps(data))
+print(response.text)
 
