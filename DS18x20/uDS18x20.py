@@ -2,6 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 
+'''
+Ref: Circuit diagram:
+    https://learn.adafruit.com/using-ds18b20-temperature-sensor-with-circuitpython/hardware
+
+    Code: https://learn.adafruit.com/using-ds18b20-temperature-sensor-with-circuitpython/circuitpython
+
+'''
+
 import time
 import board
 from adafruit_onewire.bus import OneWireBus
