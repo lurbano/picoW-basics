@@ -30,7 +30,11 @@ class uDS18X20:
         self.ow_bus = OneWireBus(dataPin)
 
         # scan for temp sensor
-        self.ds18 = DS18X20(self.ow_bus, self.ow_bus.scan()[0])
+        try:
+            self.ds18 = DS18X20(self.ow_bus, self.ow_bus.scan()[0])
+        except:
+            print()
+            raise Exception("Error: Temperature Sensor Not Found on OneWire")
 
 
     def read(self):
@@ -76,5 +80,6 @@ class uDS18X20:
                     
             except Exception:
                 continue
+
 
 
