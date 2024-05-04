@@ -1,6 +1,6 @@
 # picoW-basics
 
-Basic functions working with the Pi pico W - especially for wireless capabilities.
+Basic functions for working with the Pi pico W - especially for using its wireless capabilities.
 
 # Setup
 
