@@ -20,7 +20,7 @@ def get_n(t):
     return min(n, nPix)
 
 # Time settings
-tFactor = 2  # set to 60 for minutes
+tFactor = 60  # set to 60 for minutes
 greenTime = 10 * tFactor
 yellowTime = 2 * tFactor
 redTime = 3 * tFactor
