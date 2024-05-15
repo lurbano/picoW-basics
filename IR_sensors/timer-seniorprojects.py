@@ -21,6 +21,7 @@ def get_n(t):
 
 # Time settings
 tFactor = 60  # set to 60 for minutes
+
 greenTime = 10 * tFactor
 yellowTime = 2 * tFactor
 redTime = 3 * tFactor
@@ -28,7 +29,7 @@ redTime = 3 * tFactor
 greenCol = (0, 40, 0)
 yellowCol = (20, 20, 0)
 redCol = (40, 0, 0)
-baseCol = (0, 10, 10)
+baseCol = (0, 5, 5)
 
 totalTime = greenTime + yellowTime + redTime
 nGreen = get_n(greenTime)
@@ -54,7 +55,7 @@ try:
     while True:
         runTime = time.monotonic() - startTime
         n = get_n(runTime)
-        print("n: ", n)
+        print("n: ", runTime, int(runTime/60), n)
         
         if n <= nRed:
             # light up
@@ -84,10 +85,10 @@ try:
         
         
         
-        if touch.value:
-            pixels[-1] = (0,0,20)
-        else:
-            pixels[-1] = (20,0,0)
+#         if touch.value:
+#             pixels[-1] = (0,0,20)
+#         else:
+#             pixels[-1] = (20,0,0)
         time.sleep(0.1)
 except:
     pixels[-1] = (40,0,0)
