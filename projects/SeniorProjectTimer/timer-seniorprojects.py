@@ -1,6 +1,12 @@
 # Goes with programming lessons on: https://soriki.com/pico/
 # Lensyl Urbano
 
+# 
+# This program runs a timer with a series of LED lights (20 by default)
+# It lights up a number of green lights, then yellow, then red  based
+#  on the greenTime, yellowTime, and redTime constants.
+# 
+
 import time
 import board
 import neopixel
@@ -15,17 +21,22 @@ pixels = neopixel.NeoPixel(board.GP15, nPix)
 
 pixels[-1] = (20,0,20)
 
+# get the number of lights based on the time and the tFactor global variable
 def get_n(t):
     n = int(math.ceil(t/tFactor))
     return min(n, nPix)
 
-# Time settings
+# TIME SETTINGS
+#   tFactor: scales the time values (greenTime etc.) to make it easy to put in 
+#            time in easier units like minutes (instead of doing everything in seconds)
 tFactor = 60  # set to 60 for minutes
 
+# SET THE TIMES FOR EACH COLOR
 greenTime = 10 * tFactor
 yellowTime = 2 * tFactor
 redTime = 3 * tFactor
 
+# SET THE COLORS THAT CORRESPOND TO DIFFERENT TIMES
 greenCol = (0, 40, 0)
 yellowCol = (20, 20, 0)
 redCol = (40, 0, 0)
