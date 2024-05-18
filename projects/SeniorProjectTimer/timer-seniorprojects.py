@@ -13,8 +13,8 @@ import neopixel
 import touchio
 import math
 
-touch_pad = board.GP16 
-touch = touchio.TouchIn(touch_pad)
+# touch_pad = board.GP16 
+# touch = touchio.TouchIn(touch_pad)
 
 nPix = 20
 pixels = neopixel.NeoPixel(board.GP15, nPix)
@@ -29,10 +29,10 @@ def get_n(t):
 # TIME SETTINGS
 #   tFactor: scales the time values (greenTime etc.) to make it easy to put in 
 #            time in easier units like minutes (instead of doing everything in seconds)
-tFactor = 60  # set to 60 for minutes
+tFactor = 1  # set to 60 for minutes
 
 # SET THE TIMES FOR EACH COLOR
-greenTime = 10 * tFactor
+greenTime = 7 * tFactor
 yellowTime = 2 * tFactor
 redTime = 3 * tFactor
 
@@ -47,7 +47,7 @@ nGreen = get_n(greenTime)
 nYellow = nGreen + get_n(yellowTime)
 nRed = nYellow + get_n(redTime)
 
-print("n:", nGreen, nYellow, nRed)
+print("nColors:", nGreen, nYellow, nRed)
 
 # startup sequence
 for i in range(nPix):
@@ -58,7 +58,7 @@ try:
     startTime = time.monotonic()
     # clear strip
     for i in range(nPix):
-        if i <= get_n(totalTime):
+        if i < get_n(totalTime):
             pixels[i] = baseCol
         else:
             pixels[i] = (0,0,0)
@@ -66,7 +66,7 @@ try:
     while True:
         runTime = time.monotonic() - startTime
         n = get_n(runTime)
-        print("n: ", runTime, int(runTime/60), n)
+        # print("n: ", runTime, int(runTime/60), n)
         
         if n <= nRed:
             # light up
@@ -92,7 +92,7 @@ try:
                 time.sleep(0.25)
                     
                 
-        time.sleep(1)
+        time.sleep(0.1)
         
         
         
@@ -105,3 +105,4 @@ except:
     pixels[-1] = (40,0,0)
     print("Error")
     
+
