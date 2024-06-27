@@ -1,3 +1,5 @@
+# Ref: https://microcontrollerslab.com/dc-motor-l298n-driver-raspberry-pi-pico-tutorial/
+
 from machine import Pin, PWM
 from time import sleep
 
