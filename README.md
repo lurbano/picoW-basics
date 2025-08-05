@@ -85,3 +85,6 @@ Copy the adafruit_requests file from the lib folder to the lib folder on the pic
 **Audio**:
 * Reference (adafruit): https://learn.adafruit.com/mp3-playback-rp2040/pico-mp3
 ---
+
+**DC Motors**
+
