@@ -5,15 +5,20 @@ from adafruit_motor import stepper
 
 # requires adafruit_motor
 
-in1=board.GP9
-in2=board.GP10
-in3=board.GP11
-in4=board.GP12
+in1=board.GP18
+in2=board.GP19
+in3=board.GP20
+in4=board.GP21
 
 DELAY = 0.005
 STEPS = 2000
 
-# To use with CircuitPython and a microcontroller:
+# Wiring on ULN2003 board
+#
+#  Pico 5V to +
+#  Pico GND to -
+#
+# Inputs set below:
 coils = (
     digitalio.DigitalInOut(in1),  # A1
     digitalio.DigitalInOut(in2),  # A2
@@ -31,3 +36,6 @@ for step in range(STEPS):
     time.sleep(DELAY)
     
 motor.release()
+
+print("done")
+
